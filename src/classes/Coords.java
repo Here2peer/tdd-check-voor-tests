@@ -1,5 +1,8 @@
 package classes;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Coords implements interfaces.Coords {
     private int q;
     private int r;
@@ -37,6 +40,17 @@ public class Coords implements interfaces.Coords {
     public boolean coordsWithinThreshold(Coords c, int threshold) {
         return Math.abs(c.getQ() - q) <= threshold && Math.abs(c.getR() - r) <= threshold;
     }
+
+    public List<Coords> getAllNeighborsCoords() {
+        Coords case1 = new Coords(q - 1, r);
+        Coords case2 = new Coords(q + 1, r);
+        Coords case3 = new Coords(q, r + 1);
+        Coords case4 = new Coords(q, r - 1);
+        Coords case5 = new Coords(q + 1, r - 1);
+        Coords case6 = new Coords(q - 1, r + 1);
+        return Arrays.asList(case1, case2, case3, case4, case5, case6);
+    }
+
     @Override
     public boolean equals(Object coord) {
         if (coord instanceof Coords) {
