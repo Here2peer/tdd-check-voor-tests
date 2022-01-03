@@ -1,9 +1,8 @@
 package classes;
 
-import nl.hive.hanze.Hive;
+import interfaces.Hive;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 

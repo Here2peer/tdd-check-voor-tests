@@ -1,6 +1,6 @@
 package classes;
 
-import nl.hive.hanze.Hive;
+import interfaces.Hive;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,16 +130,37 @@ public class Game implements Hive {
         return isWinner(Player.WHITE) && isWinner(Player.BLACK);
     }
 
-    private Board getBoard() {
-        return board;
+    public boolean allTilesPlayed(Hive.Player player) {
+        int grasshopper = 3;
+        int soldierAnt = 3;
+        int beetle = 2;
+        int spider = 2;
+        int queenBee = 1;
+
+        for (classes.Tile entry : board.getBoard()) {
+            if (entry.getPlayer() == player) {
+                switch (entry.getTileType()) {
+                    case GRASSHOPPER -> grasshopper--;
+                    case SOLDIER_ANT -> soldierAnt--;
+                    case BEETLE -> beetle--;
+                    case SPIDER -> spider--;
+                    case QUEEN_BEE -> queenBee--;
+                }
+            }
+        }
+
+        return (grasshopper == 0 && soldierAnt == 0 && beetle == 0 && spider == 0 && queenBee == 0);
     }
 
-    public boolean tryMove(classes.Tile tile, int fromQ, int fromR, int toQ, int toR) throws IllegalMove {
+    // TODO:
+    //  Use Open Closed principle as detailed here: https://java2blog.com/open-closed-principle-java/
+    //  and here: https://blog.scottlogic.com/2016/07/28/java-enums-how-to-use-them-smarter.html
+    //  Create a Move class.
+    public boolean tryMove(classes.Tile tile, int fromQ, int fromR, int toQ, int toR) {
         ArrayList<classes.Tile> swarm = new ArrayList<>();
         boolean moveToSameLocation = (fromQ == toQ) && (fromR == toR);
         boolean moveByOneAllowed = Math.abs(fromQ - toQ) <= 1 && Math.abs(fromR - toR) <= 1;
         boolean destinationIsNotOccupied = (board.getTile(toQ, toR) == null);
-        boolean moveDone = false;
 
         // Needs refactoring
         tile.setCoords(toQ, toR);
@@ -151,93 +172,18 @@ public class Game implements Hive {
             return false;
         }
 
-        switch (tile.getTileType()) {
-            case QUEEN_BEE:
-                if(destinationIsNotOccupied) {
-                    if (moveByOneAllowed) {
-                        // tile.setCoords(toQ, toR);
-                        return true;
-                    }
-                }
-                break;
-            case BEETLE:
-                if (moveByOneAllowed) {
-                    ArrayList<Coords> path = new ArrayList<>();
-                    if (!destinationIsNotOccupied) {
-                        return true;
-                    }
-                    if (isPathAvailable(tile.getCoords(), toQ, toR, path)) {
-                        // tile.setCoords(toQ, toR);
-                        return true;
-                    }
-                }
-                break;
-            case SOLDIER_ANT:
-                if (destinationIsNotOccupied) {
-                    if (!moveToSameLocation) {
-                        ArrayList<Coords> path = new ArrayList<>();
-                        if(isPathAvailable(tile.getCoords(), toQ, toR, path)) {
-                            // tile.setCoords(toQ, toR);
-                            return true;
-                        }
-                    }
-                }
-                break;
-            case SPIDER:
-                if (destinationIsNotOccupied) {
-                    if (!moveToSameLocation) {
-                        if (Math.abs(Math.abs(fromQ) - Math.abs(toQ)) + Math.abs(Math.abs(fromR) - Math.abs(toR)) == 3) {
-                            ArrayList<Coords> path = new ArrayList<>();
-                            if (isPathAvailable(tile.getCoords(), toQ, toR, path)) {
-                                // tile.setCoords(toQ, toR);
-                                return true;
-                            }
-                        }
-                    }
-                }
-                break;
-            case GRASSHOPPER:
-                int moveDistanceQ = Math.abs(fromQ - toQ);
-                int moveDistanceR = Math.abs(fromR - toR);
-                boolean minusQ = toQ < fromQ;
-                boolean minusR = toR < fromR;
-                boolean qChanged = moveDistanceQ != 0;
-                boolean illegal = false;
-                int q = fromQ;
-                int r = fromR;
-                int step;
-
-                if (destinationIsNotOccupied) {
-                    if(moveDistanceQ == 0 || moveDistanceR == 0){
-                        for (int i = 1; i < Math.abs(moveDistanceQ+moveDistanceR); i++) {
-                            if (minusQ || minusR) {
-                                step = i * -1;
-                            } else {
-                                step = i;
-                            }
-
-                            if (qChanged) {
-                                q = fromQ + step;
-                            } else {
-                                r = fromR + step;
-                            }
-                            if (board.getTile(q, r) == null) {
-                                illegal = true;
-                                break;
-                            }
-                        }
-                        if (!illegal) {
-                            // tile.setCoords(toQ, toR);
-                            moveDone = true;
-                        }
-                    }
-                }
+        if (tile.getTileType().equals(Tile.QUEEN_BEE)) {
+            return tryMoveQueenBee(destinationIsNotOccupied, moveByOneAllowed);
+        } else if (tile.getTileType().equals(Tile.BEETLE)) {
+            return tryMoveBeetle(moveByOneAllowed, destinationIsNotOccupied, tile, toQ, toR);
+        } else if (tile.getTileType().equals(Tile.SOLDIER_ANT)) {
+            return tryMoveSoldierAnt(destinationIsNotOccupied, moveToSameLocation, tile, toQ, toR);
+        } else if (tile.getTileType().equals(Tile.SPIDER)) {
+            return tryMoveSpider(destinationIsNotOccupied, moveToSameLocation, tile, toQ, toR, fromQ, fromR);
+        } else if (tile.getTileType().equals(Tile.GRASSHOPPER)) {
+            return tryMoveGrasshopper(destinationIsNotOccupied,moveToSameLocation, toQ, toR, fromQ, fromR);
         }
-        return moveDone;
-    }
-
-    public Boolean checkPath(int q, int r, int toQ, int toR) {
-        return null;
+        return false;
     }
 
     public Boolean checkTileConnections(classes.Tile entry, ArrayList<classes.Tile> swarm) {
@@ -267,12 +213,11 @@ public class Game implements Hive {
         return connected;
     }
 
-    public ArrayList<Coords> noPathAvailable(classes.Tile entry, ArrayList<Coords> path) {
+    public void noPathAvailable(classes.Tile entry, ArrayList<Coords> path) {
         int q = entry.getCoords().getQ();
         int r = entry.getCoords().getR();
         Coords firstEntry = new Coords(q, r);
         path.add(firstEntry);
-        return path;
     }
 
     public boolean isPathAvailable(classes.Coords coords, int toQ, int toR, ArrayList<Coords> path) {
@@ -337,35 +282,11 @@ public class Game implements Hive {
         }
     }
 
-    public boolean allTilesPlayed(Hive.Player player) {
-        int grasshopper = 3;
-        int soldierAnt = 3;
-        int beetle = 2;
-        int spider = 2;
-        int queenBee = 1;
-
-        for (classes.Tile entry : board.getBoard()) {
-            if (entry.getPlayer() == player) {
-                switch (entry.getTileType()) {
-                    case GRASSHOPPER -> grasshopper--;
-                    case SOLDIER_ANT -> soldierAnt--;
-                    case BEETLE -> beetle--;
-                    case SPIDER -> spider--;
-                    case QUEEN_BEE -> queenBee--;
-                }
-            }
-        }
-
-        return (grasshopper == 0 && soldierAnt == 0 && beetle == 0 && spider == 0 && queenBee == 0);
-    }
-
     //Todo: Create function for Pass movement:
     // Pass for soldier ant and spider needs to be implemented
     // refactor code, below code is non functional.
     public ArrayList<Coords> getPossibleMoves(int q, int r) {
         classes.Tile tile = board.getTile(q, r);
-        int toR = tile.getCoords().getQ();
-        int toQ = tile.getCoords().getR();
 
         ArrayList<Coords> path = new ArrayList<>();
         path.add(tile.getCoords());
@@ -375,71 +296,162 @@ public class Game implements Hive {
 
         List<Coords> neighborsCoords = tile.getCoords().getAllNeighborsCoords();
 
-        switch (tile.getTileType()){
-            case QUEEN_BEE:
-                for (Coords move : neighborsCoords) {
-                    if (board.getTile(move.getQ(), move.getR()) == null) {
-                        possibleMoves.add(move);
-                    }
-                }
-                break;
-            case BEETLE:
-                for (Coords move : neighborsCoords) {
-                    if (board.getTile(move.getQ(), move.getR()) != null ) {
-                        possibleMoves.add(move);
-                    } else if(isPathAvailable(tile.getCoords(), move.getQ(), move.getR(), path)){
-                        possibleMoves.add(move);
-                    }
-                }
-                break;
-            case GRASSHOPPER:
-                for (classes.Tile neighbor : board.getNeighbors(tile)) {
-                    if (neighbor != null && !neighbor.equals(tile)) {
-                        toQ = neighbor.getCoords().getQ();
-                        toR = neighbor.getCoords().getR();
-
-                        if(board.getTile(q+1, r) != null && !board.getTile(q+1, r).equals(tile)) {
-                            while (board.getTile(toQ, toR) != null) {
-                                toQ++;
-                                if (board.getTile(toQ, toR) == null) {
-                                    possibleMoves.add(new Coords(toQ, toR));
-                                }
-                            }
-                        }
-                        if(board.getTile(q-1, r) != null && !board.getTile(q-1, r).equals(tile)) {
-                            toQ = neighbor.getCoords().getQ();
-                            toR = neighbor.getCoords().getR();
-                            while (board.getTile(toQ, toR) != null) {
-                                toQ--;
-                                possibleMoves.add(new Coords(toQ, toR));
-                            }
-                        }
-
-                        if(board.getTile(q, r+1) != null && !board.getTile(q, r+1).equals(tile)) {
-                            toQ = neighbor.getCoords().getQ();
-                            toR = neighbor.getCoords().getR();
-                            while (board.getTile(toQ, toR) != null) {
-                                toR++;
-                                possibleMoves.add(new Coords(toQ, toR));
-                            }
-                        }
-                        if(board.getTile(q, r-1) != null && !board.getTile(q, r-1).equals(tile)) {
-                            toQ = neighbor.getCoords().getQ();
-                            toR = neighbor.getCoords().getR();
-                            while (board.getTile(toQ, toR) != null) {
-                                toR--;
-                                possibleMoves.add(new Coords(toQ, toR));
-                            }
-                        }
-                    }
-                }
-                break;
-            case SPIDER:
-                break;
-            case SOLDIER_ANT:
-                break;
+        if (tile.getTileType().equals(Tile.QUEEN_BEE)) {
+            getMovesForQueenBee(neighborsCoords, possibleMoves);
+        } else if (tile.getTileType().equals(Tile.BEETLE)){
+            getMovesForBeetle(neighborsCoords, tile, possibleMoves, path);
+        } else if (tile.getTileType().equals(Tile.GRASSHOPPER)){
+            getMovesForGrasshopper(tile, q, r, possibleMoves);
+        } else if (tile.getTileType().equals(Tile.SPIDER)){
+            getMovesForSpider();
+        } else if (tile.getTileType().equals(Tile.SOLDIER_ANT)){
+            getMovesForSoldierAnt();
         }
-
         return possibleMoves;
     }
+
+    private boolean tryMoveQueenBee(boolean destinationIsNotOccupied, boolean moveByOneAllowed) {
+        if(destinationIsNotOccupied) {
+            if (moveByOneAllowed) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean tryMoveBeetle(boolean moveByOneAllowed, boolean destinationIsNotOccupied, classes.Tile tile, int toQ, int toR) {
+        if (moveByOneAllowed) {
+            ArrayList<Coords> path = new ArrayList<>();
+            if (!destinationIsNotOccupied) {
+                return true;
+            }
+            if (isPathAvailable(tile.getCoords(), toQ, toR, path)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean tryMoveSoldierAnt(boolean destinationIsNotOccupied, boolean moveToSameLocation, classes.Tile tile, int toQ, int toR) {
+        if (destinationIsNotOccupied) {
+            if (!moveToSameLocation) {
+                ArrayList<Coords> path = new ArrayList<>();
+                if(isPathAvailable(tile.getCoords(), toQ, toR, path)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean tryMoveSpider(boolean destinationIsNotOccupied, boolean moveToSameLocation, classes.Tile tile, int toQ, int toR, int fromQ , int fromR) {
+        if (destinationIsNotOccupied) {
+            if (!moveToSameLocation) {
+                if (Math.abs(Math.abs(fromQ) - Math.abs(toQ)) + Math.abs(Math.abs(fromR) - Math.abs(toR)) == 3) {
+                    ArrayList<Coords> path = new ArrayList<>();
+                    if (isPathAvailable(tile.getCoords(), toQ, toR, path)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean tryMoveGrasshopper(boolean destinationIsNotOccupied, boolean moveToSameLocation, int toQ, int toR, int fromQ, int fromR) {
+        int moveDistanceQ = Math.abs(fromQ - toQ);
+        int moveDistanceR = Math.abs(fromR - toR);
+        boolean minusQ = toQ < fromQ;
+        boolean minusR = toR < fromR;
+        boolean qChanged = moveDistanceQ != 0;
+        boolean illegal = false;
+        int q = fromQ;
+        int r = fromR;
+        int step;
+
+        if (destinationIsNotOccupied) {
+            if(moveDistanceQ == 0 || moveDistanceR == 0){
+                for (int i = 1; i < Math.abs(moveDistanceQ+moveDistanceR); i++) {
+                    if (minusQ || minusR) {
+                        step = i * -1;
+                    } else {
+                        step = i;
+                    }
+
+                    if (qChanged) {
+                        q = fromQ + step;
+                    } else {
+                        r = fromR + step;
+                    }
+                    if (board.getTile(q, r) == null) {
+                        illegal = true;
+                        break;
+                    }
+                }
+                return !illegal;
+            }
+        }
+        return false;
+    }
+
+    private void getMovesForQueenBee(List<Coords> neighborsCoords, ArrayList<Coords> possibleMoves) {
+        for (Coords move : neighborsCoords) {
+            if (board.getTile(move.getQ(), move.getR()) == null) {
+                possibleMoves.add(move);
+            }
+        }
+    }
+    private void getMovesForBeetle(List<Coords> neighborsCoords, classes.Tile tile, ArrayList<Coords> possibleMoves, ArrayList<Coords> path) {
+        for (Coords move : neighborsCoords) {
+            if (board.getTile(move.getQ(), move.getR()) != null ) {
+                possibleMoves.add(move);
+            } else if(isPathAvailable(tile.getCoords(), move.getQ(), move.getR(), path)){
+                possibleMoves.add(move);
+            }
+        }
+    }
+    private void getMovesForGrasshopper(classes.Tile tile, int q, int r, ArrayList<Coords> possibleMoves) {
+        for (classes.Tile neighbor : board.getNeighbors(tile)) {
+            if (neighbor != null && !neighbor.equals(tile)) {
+                int toQ = neighbor.getCoords().getQ();
+                int toR = neighbor.getCoords().getR();
+
+                if(board.getTile(q+1, r) != null && !board.getTile(q+1, r).equals(tile)) {
+                    while (board.getTile(toQ, toR) != null) {
+                        toQ++;
+                        if (board.getTile(toQ, toR) == null) {
+                            possibleMoves.add(new Coords(toQ, toR));
+                        }
+                    }
+                }
+                if(board.getTile(q-1, r) != null && !board.getTile(q-1, r).equals(tile)) {
+                    toQ = neighbor.getCoords().getQ();
+                    toR = neighbor.getCoords().getR();
+                    while (board.getTile(toQ, toR) != null) {
+                        toQ--;
+                        possibleMoves.add(new Coords(toQ, toR));
+                    }
+                }
+
+                if(board.getTile(q, r+1) != null && !board.getTile(q, r+1).equals(tile)) {
+                    toQ = neighbor.getCoords().getQ();
+                    toR = neighbor.getCoords().getR();
+                    while (board.getTile(toQ, toR) != null) {
+                        toR++;
+                        possibleMoves.add(new Coords(toQ, toR));
+                    }
+                }
+                if(board.getTile(q, r-1) != null && !board.getTile(q, r-1).equals(tile)) {
+                    toQ = neighbor.getCoords().getQ();
+                    toR = neighbor.getCoords().getR();
+                    while (board.getTile(toQ, toR) != null) {
+                        toR--;
+                        possibleMoves.add(new Coords(toQ, toR));
+                    }
+                }
+            }
+        }
+    }
+    private void getMovesForSpider() {}
+    private void getMovesForSoldierAnt() {}
 }

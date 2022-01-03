@@ -25,6 +25,6 @@ public class CoordsTest {
         Coords case2 = new Coords();
         case1.setCoords(0,0);
         case2.setCoords(0,0);
-        Assertions.assertTrue(case1.equals(case2));
+        Assertions.assertEquals(case1, case2);
     }
 }

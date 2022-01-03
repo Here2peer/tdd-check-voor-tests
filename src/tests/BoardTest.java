@@ -1,8 +1,7 @@
 package tests;
 
 import classes.Board;
-import classes.Coords;
-import nl.hive.hanze.Hive;
+import interfaces.Hive;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +54,7 @@ public class BoardTest {
     }
 
     @Test
-    public void SetTile() throws Board.NoTileFound {
+    public void SetTile() {
         int q = 0;
         int r = 0;
         tile = new classes.Tile(q, r, Hive.Player.BLACK, Hive.Tile.BEETLE);
@@ -64,7 +63,7 @@ public class BoardTest {
     }
 
     @Test
-    public void GetNeighbor() throws Board.NoTileFound {
+    public void GetNeighbor() {
         List<classes.Tile> listOfNeighbors = new ArrayList<>();
         tile.setCoords(1, 1);
         Assertions.assertEquals(listOfNeighbors.getClass(), board.getNeighbors(tile).getClass());

@@ -1,7 +1,7 @@
 package classes;
 
-import nl.hive.hanze.Hive;
-import nl.hive.hanze.Hive.Player;
+import interfaces.Hive;
+import interfaces.Hive.Player;
 
 public class Tile {
     private Coords coords;

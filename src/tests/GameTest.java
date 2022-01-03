@@ -3,12 +3,11 @@ package tests;
 import classes.Board;
 import classes.Coords;
 import classes.Game;
-import nl.hive.hanze.Hive;
+import interfaces.Hive;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -65,9 +64,7 @@ class GameTest {
         game.play(Hive.Tile.SPIDER, 1,0);
         game.play(Hive.Tile.SOLDIER_ANT, 1,1);
 
-        assertThrows(Hive.IllegalMove.class, () -> {
-            game.play(Hive.Tile.GRASSHOPPER, 0,1);
-        });
+        assertThrows(Hive.IllegalMove.class, () -> game.play(Hive.Tile.GRASSHOPPER, 0,1));
 
     }
 
@@ -180,9 +177,7 @@ class GameTest {
         game.play(Hive.Tile.SPIDER, -1, 0);
 
         //EDIT FOR ALL TEST CASES.
-        assertThrows(Hive.IllegalMove.class, () -> {
-            game.move(0, 0, 0, -1);
-        });
+        assertThrows(Hive.IllegalMove.class, () -> game.move(0, 0, 0, -1));
     }
 
 
@@ -210,9 +205,7 @@ class GameTest {
         game.play(Hive.Tile.BEETLE, 0, 0);
         game.play(Hive.Tile.BEETLE, -1, 0);
         game.play(Hive.Tile.GRASSHOPPER, -1, +1);
-        assertThrows(Hive.IllegalMove.class, () -> {
-            game.move(-1, +1, -1, 2);
-        });
+        assertThrows(Hive.IllegalMove.class, () -> game.move(-1, +1, -1, 2));
     }
 
     @Test
@@ -333,36 +326,6 @@ class GameTest {
         assertTrue(game.checkTileConnections(tile4, swarm));
     }
 
-    @Test
-    public void CheckIfAllTilesAreStillConnectedWithSwarmDisconnected() {
-        classes.Tile tile1 = new classes.Tile();
-        classes.Tile tile2 = new classes.Tile();
-        classes.Tile tile3 = new classes.Tile();
-        classes.Tile tile4 = new classes.Tile();
-        classes.Tile tile5 = new classes.Tile();
-        classes.Tile tile6 = new classes.Tile();
-        classes.Tile tile7 = new classes.Tile();
-
-        tile1.setCoords(0,0);
-        tile2.setCoords(1, -1);
-        tile3.setCoords(1, 0);
-        tile4.setCoords(0, 1);
-        tile5.setCoords(0, -1);
-        tile6.setCoords(-4, 3);
-        tile7.setCoords(-4, 4);
-
-        board.setTile(tile1);
-        board.setTile(tile2);
-        board.setTile(tile3);
-        board.setTile(tile4);
-        board.setTile(tile5);
-        board.setTile(tile6);
-        board.setTile(tile7);
-
-        ArrayList<classes.Tile> swarm = new ArrayList<>();
-        swarm.add(tile6);
-        assertFalse(game.checkTileConnections(tile6, swarm));
-    }
 
     @Test
     public void GetPossiblePathFromCoordsToDestination() throws Hive.IllegalMove {
