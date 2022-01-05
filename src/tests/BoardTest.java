@@ -32,25 +32,14 @@ public class BoardTest {
     public void BoardGetTile() {
         classes.Tile qt = new classes.Tile(0, 0, Hive.Player.BLACK, Hive.Tile.BEETLE);
         board.setTile(qt);
-        try {
-            Assertions.assertEquals(qt, board.getTile(0, 0));
-        }catch (Exception ignored) {
-
-        }
+        Assertions.assertEquals(qt, board.getTile(0, 0));
     }
 
     @Test
     public void BoardEmptyGetTile() {
         int q = 0;
         int r = 0;
-        classes.Tile qt = new classes.Tile(q, r, Hive.Player.BLACK, Hive.Tile.BEETLE);
-        try {
-            board.getTile(q, r);
-        }catch (Exception e) {
-            String expectedMessage = "No tile on board with" + q + r + "." ;
-            String actualMessage = e.getMessage();
-            assertTrue(actualMessage.contains(expectedMessage));
-        }
+        assertNull(board.getTile(q, r));
     }
 
     @Test

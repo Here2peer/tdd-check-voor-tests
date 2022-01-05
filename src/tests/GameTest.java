@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GameTest {
     Game game;
-    Board board;
     classes.Tile tile;
 
     @BeforeEach
@@ -38,13 +37,7 @@ class GameTest {
     @Test
     public void playTileOnTile() throws Hive.IllegalMove {
         game.play(Hive.Tile.SPIDER, 0,0);
-        try {
-            game.play(Hive.Tile.BEETLE, 0,0);
-        }catch (Hive.IllegalMove e) {
-            String expectedMessage = "Illegal move, move not allowed.";
-            String actualMessage = e.getMessage();
-            assertTrue(actualMessage.contains(expectedMessage));
-        }
+        assertThrows(Hive.IllegalMove.class, () -> game.play(Hive.Tile.BEETLE, 0,0));
     }
 
     // Requirement 4e
@@ -56,9 +49,9 @@ class GameTest {
         game.play(Hive.Tile.SOLDIER_ANT, 1,1);
     }
 
-
+    //Fix this
     @Test
-    public void PlayFiveTilesWhileQueenIsNotPlayedIlligalMove() throws Hive.IllegalMove {
+    public void PlayFiveTilesWhileQueenIsNotPlayedIllegalMove() throws Hive.IllegalMove {
         game.play(Hive.Tile.SPIDER, 0,0);
         game.play(Hive.Tile.BEETLE, -1,0);
         game.play(Hive.Tile.SPIDER, 1,0);
@@ -84,11 +77,7 @@ class GameTest {
         int r = 0;
 
         game.play(Hive.Tile.BEETLE, q, r);
-        try {
-            game.play(Hive.Tile.SPIDER, q-1, r);
-        } catch (Exception e) {
-            assertEquals("Illegal move, move not allowed.", e.getMessage());
-        }
+        assertThrows(Hive.IllegalMove.class, () -> game.play(Hive.Tile.SPIDER, q-1, r));
     }
 
     @Test
@@ -107,11 +96,7 @@ class GameTest {
     @Test
     public void moveQueenTileIllegalPosition() throws Hive.IllegalMove {
         game.play(Hive.Tile.QUEEN_BEE, 0, 0);
-        try {
-            game.move(0, 0, 1, 1);
-        } catch (Exception e) {
-            assertEquals("Illegal move, move not allowed.", e.getMessage());
-        }
+        assertThrows(Hive.IllegalMove.class, () -> game.move(0, 0, 1, 1));
     }
 
     @Test
@@ -150,22 +135,14 @@ class GameTest {
     public void moveGrasshopperTileIllegallyOverEmptyTiles() throws Hive.IllegalMove {
         game.play(Hive.Tile.BEETLE, -1, 0);
         game.play(Hive.Tile.GRASSHOPPER, -2, 0);
-        try {
-            game.move(-2, 0, 1, 0);
-        } catch (Exception e) {
-            assertTrue(e.getMessage().contains("Illegal move, move not allowed."));
-        }
+        assertThrows(Hive.IllegalMove.class, () -> game.move(-2, 0, 1, 0));
     }
 
     @Test
     public void MoveTileAndCreateTwoSwarms() throws Hive.IllegalMove {
         game.play(Hive.Tile.BEETLE, -1, 0);
         game.play(Hive.Tile.GRASSHOPPER, -2, 0);
-        try {
-            game.move(-2,0,-3,0);
-        } catch (Exception e) {
-            assertTrue(e.getMessage().contains("Illegal move, move not allowed."));
-        }
+        assertThrows(Hive.IllegalMove.class, () -> game.move(-2,0,-3,0));
     }
     @Test
     public void moveTileInBetweenTilesIllegalMove() throws Hive.IllegalMove {
@@ -266,28 +243,6 @@ class GameTest {
     }
 
     @Test
-    public void findPossibleMovesForQueenBee() throws Hive.IllegalMove {
-        game.play(Hive.Tile.QUEEN_BEE, 0, 0);
-        game.play(Hive.Tile.SPIDER, 1, 0);
-        assertFalse(game.getPossibleMoves(0,0).isEmpty());
-    }
-
-    @Test
-    public void findPossibleMovesForBeetle() throws Hive.IllegalMove {
-        game.play(Hive.Tile.BEETLE, 0,0);
-        game.play(Hive.Tile.SPIDER, 1, 0);
-        assertFalse(game.getPossibleMoves(0, 0).isEmpty());
-    }
-
-    @Test
-    public void findPossibleMovesForGrasshopper() throws Hive.IllegalMove {
-        game.play(Hive.Tile.GRASSHOPPER, 0,0);
-        game.play(Hive.Tile.SPIDER, 1,0);
-        game.play(Hive.Tile.SPIDER, -1,0);
-        assertFalse(game.getPossibleMoves(0,0).isEmpty());
-    }
-
-    @Test
     public void CheckIfAllTilesArePlayedForPlayerWhite() throws Hive.IllegalMove {
         game.play(Hive.Tile.QUEEN_BEE, 0, 0);
         game.play(Hive.Tile.SPIDER, 1, 0);
@@ -304,46 +259,10 @@ class GameTest {
         assertTrue(game.allTilesPlayed(Hive.Player.WHITE));
     }
 
-    @Test
-    public void CheckIfAllTilesAreStillConnected() throws Hive.IllegalMove {
-        classes.Tile tile4 = new classes.Tile();
-
-        ArrayList<classes.Tile> swarm = new ArrayList<>();
 
 
-        tile4.setCoords(0, -1);
 
 
-        game.play(Hive.Tile.BEETLE, 1, -1);
-        game.play(Hive.Tile.QUEEN_BEE, 1, 0);
-        game.play(Hive.Tile.SOLDIER_ANT, 0, 1);
-        game.play(Hive.Tile.SOLDIER_ANT, 0, -1);
-        game.play(Hive.Tile.GRASSHOPPER, -1, 2);
-        game.play(Hive.Tile.GRASSHOPPER, -1, 0);
-        game.play(Hive.Tile.GRASSHOPPER, -1, 3);
-
-        swarm.add(tile4);
-        assertTrue(game.checkTileConnections(tile4, swarm));
-    }
-
-
-    @Test
-    public void GetPossiblePathFromCoordsToDestination() throws Hive.IllegalMove {
-        int toQ = 2;
-        int toR = 0;
-
-        Coords coords = new Coords(0,0);
-
-        game.play(Hive.Tile.SOLDIER_ANT, 0,0);
-        game.play(Hive.Tile.SOLDIER_ANT, 1,-1);
-        game.play(Hive.Tile.QUEEN_BEE, 1,0);
-        game.play(Hive.Tile.SOLDIER_ANT, 0,1);
-        game.play(Hive.Tile.SPIDER, 0,-1);
-        game.play(Hive.Tile.SPIDER, -1,2);
-
-        ArrayList<Coords> path = new ArrayList<>();
-        assertTrue(game.isPathAvailable(coords, toQ, toR, path));
-    }
 
 
 }
