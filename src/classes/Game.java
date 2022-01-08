@@ -33,7 +33,6 @@ public class Game implements Hive {
         List<classes.Tile> gameBoard = board.getBoard();
         classes.Tile playableTile = new classes.Tile(q, r, playerEnum, tile);
         boolean illegal = false;
-
         if (gameBoard.isEmpty()) {
             board.setTile(playableTile);
             return;
@@ -41,8 +40,8 @@ public class Game implements Hive {
             illegal = true;
         } else {
             List<classes.Tile> neighbors = board.getNeighbors(playableTile);
-            int count = 0;
-            boolean queen = false;
+            int count = 1;
+            boolean queen = board.getQueen(playerEnum) != null;
             for (classes.Tile neighbor : neighbors){
                 if (neighbor != null) {
                     count++;
@@ -50,9 +49,10 @@ public class Game implements Hive {
                         queen = true;
                     }
 
-                    if ((!Objects.equals(neighbor.getPlayer(), playerEnum)) || (count >= 3) && !queen) {
+                    if ((!Objects.equals(neighbor.getPlayer(), playerEnum) || count >= 3) && !queen) {
                         illegal = true;
                         break;
+
                     }
                 }
             }
