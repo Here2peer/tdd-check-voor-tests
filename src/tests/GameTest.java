@@ -77,6 +77,7 @@ class GameTest {
         int r = 0;
 
         game.play(Hive.Tile.BEETLE, q, r);
+        game.nextPlayer();
         assertThrows(Hive.IllegalMove.class, () -> game.play(Hive.Tile.SPIDER, q-1, r));
     }
 
