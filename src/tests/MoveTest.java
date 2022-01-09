@@ -27,6 +27,7 @@ public class MoveTest {
         move = new Move(board);
     }
 
+    // Requirement 5c
     @Test
     public void GetPossiblePathFromCoordsToDestination() throws Hive.IllegalMove {
         int toQ = 2;
@@ -45,6 +46,7 @@ public class MoveTest {
         assertTrue(move.isPathAvailable(coords, toQ, toR, path));
     }
 
+    // Requirement 5d
     @Test
     public void CheckIfAllTilesAreStillConnected() throws Hive.IllegalMove {
         classes.Tile tile4 = new classes.Tile();
@@ -65,6 +67,7 @@ public class MoveTest {
         assertTrue(move.checkTileConnections(tile4, swarm));
     }
 
+    // Requirement 8
     @Test
     public void findPossibleMovesForQueenBee() throws Hive.IllegalMove {
         board.setTile(new Tile(0, 0, Hive.Player.WHITE, Hive.Tile.QUEEN_BEE));
@@ -72,6 +75,7 @@ public class MoveTest {
         assertFalse(move.getPossibleMoves(0,0).isEmpty());
     }
 
+    // Requirement 7
     @Test
     public void findPossibleMovesForBeetle() throws Hive.IllegalMove {
         board.setTile(new Tile(0,0, Hive.Player.WHITE, Hive.Tile.BEETLE));
@@ -79,6 +83,7 @@ public class MoveTest {
         assertFalse(move.getPossibleMoves(0, 0).isEmpty());
     }
 
+    // Requirement 11
     @Test
     public void findPossibleMovesForGrasshopper() throws Hive.IllegalMove {
         board.setTile(new Tile(0,0, Hive.Player.WHITE, Hive.Tile.GRASSHOPPER));
@@ -119,6 +124,7 @@ public class MoveTest {
         assertFalse(move.isPathAvailable(movedTile.getCoords(), toQ, toR, path));
     }
 
+    // Requirement 5d
     @Test
     public void CheckIfAllTilesAreStillConnectedWithSwarmDisconnected() {
         Tile tile1 = new Tile();

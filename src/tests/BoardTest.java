@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BoardTest {
     Board board;
     classes.Tile tile;
+
     @BeforeEach
     public void CreateNewBoardBeforeEachTest(){
         board = new Board();
@@ -21,6 +22,7 @@ public class BoardTest {
         board.createBoard();
     }
 
+    // Requirement 2c
     @Test
     public void BoardContainsEmptyBoard(){
 
@@ -42,6 +44,8 @@ public class BoardTest {
         assertNull(board.getTile(q, r));
     }
 
+
+    // Requirement 2d
     @Test
     public void SetTile() {
         int q = 0;
@@ -51,6 +55,8 @@ public class BoardTest {
         Assertions.assertEquals(tile, board.getTile(q, r));
     }
 
+
+    // Requirement 2b
     @Test
     public void GetNeighbor() {
         List<classes.Tile> listOfNeighbors = new ArrayList<>();

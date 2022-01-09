@@ -49,7 +49,7 @@ class GameTest {
         game.play(Hive.Tile.SOLDIER_ANT, 1,1);
     }
 
-    //Fix this
+    // Requirement 4e
     @Test
     public void PlayFiveTilesWhileQueenIsNotPlayedIllegalMove() throws Hive.IllegalMove {
         game.play(Hive.Tile.SPIDER, 0,0);
@@ -60,6 +60,7 @@ class GameTest {
 
     }
 
+    // requirement 4c
     @Test
     public void playTileNextToNeighbor() throws Hive.IllegalMove{
         int q = 1;
@@ -70,6 +71,7 @@ class GameTest {
 
     }
 
+    //Requirement 4d
     @Test
     public void playTileNextToNeighborIllegal() throws Hive.IllegalMove {
         int q = 0;
@@ -80,6 +82,7 @@ class GameTest {
         assertThrows(Hive.IllegalMove.class, () -> game.play(Hive.Tile.SPIDER, q-1, r));
     }
 
+    // Requirement 2f
     @Test
     public void moveSpiderWhenCoveredByBeetleSpiderCantMove() throws Hive.IllegalMove{
         game.play(Hive.Tile.SPIDER, 0, 0);
@@ -88,17 +91,21 @@ class GameTest {
         game.move(0, 0, 0, 1);
     }
 
+    // Requirement 8a
     @Test
     public void moveQueenTileByOnePosition() throws Hive.IllegalMove {
         game.play(Hive.Tile.QUEEN_BEE, 0, 0);
         game.move(0, 0, 0, 1);
     }
+
+    // Requirement 8a
     @Test
     public void moveQueenTileIllegalPosition() throws Hive.IllegalMove {
         game.play(Hive.Tile.QUEEN_BEE, 0, 0);
         assertThrows(Hive.IllegalMove.class, () -> game.move(0, 0, 1, 1));
     }
 
+    // Requirement 7
     @Test
     public void moveBeetleTile() throws Hive.IllegalMove {
         game.play(Hive.Tile.QUEEN_BEE, 0, 1);
@@ -106,6 +113,7 @@ class GameTest {
         game.move(0, 0, 0, 1);
     }
 
+    // Requirement 11a
     @Test
     public void moveGrasshopperTileByFourHorizontallyLeftToRight() throws Hive.IllegalMove {
         game.play(Hive.Tile.QUEEN_BEE, 0, 0);
@@ -114,6 +122,8 @@ class GameTest {
         game.play(Hive.Tile.GRASSHOPPER, -2, 0);
         game.move(-2, 0, 2, 0);
     }
+
+    // Requirement 11a
     @Test
     public void moveGrasshopperTileByFourHorizontallyRightToLeft() throws Hive.IllegalMove {
         game.play(Hive.Tile.QUEEN_BEE, 0, 0);
@@ -122,6 +132,8 @@ class GameTest {
         game.play(Hive.Tile.GRASSHOPPER, 2, 0);
         game.move(2, 0, -2, 0);
     }
+
+    // Requirement 11a
     @Test
     public void moveGrasshopperTileByFourDiagonallyRightToLeft() throws Hive.IllegalMove {
         game.play(Hive.Tile.QUEEN_BEE, 0, 0);
@@ -131,6 +143,7 @@ class GameTest {
         game.move(0, 2, 0, -2);
     }
 
+    // Requirement 11e
     @Test
     public void moveGrasshopperTileIllegallyOverEmptyTiles() throws Hive.IllegalMove {
         game.play(Hive.Tile.BEETLE, -1, 0);
@@ -138,12 +151,15 @@ class GameTest {
         assertThrows(Hive.IllegalMove.class, () -> game.move(-2, 0, 1, 0));
     }
 
+    // Requirement 5d
     @Test
     public void MoveTileAndCreateTwoSwarms() throws Hive.IllegalMove {
         game.play(Hive.Tile.BEETLE, -1, 0);
         game.play(Hive.Tile.GRASSHOPPER, -2, 0);
         assertThrows(Hive.IllegalMove.class, () -> game.move(-2,0,-3,0));
     }
+
+    // Requirement 6b
     @Test
     public void moveTileInBetweenTilesIllegalMove() throws Hive.IllegalMove {
         game.play(Hive.Tile.QUEEN_BEE, 0, -1);
@@ -157,7 +173,7 @@ class GameTest {
         assertThrows(Hive.IllegalMove.class, () -> game.move(0, 0, 0, -1));
     }
 
-
+    // Requirement 10
     @Test
     public void moveSpiderTile() throws Hive.IllegalMove {
         game.play(Hive.Tile.QUEEN_BEE, 0, 0);
@@ -167,6 +183,7 @@ class GameTest {
         game.move(-2, 0, 1, -2);
     }
 
+    // Requirement 9
     @Test
     public void moveSoldierAntTile() throws Hive.IllegalMove {
         game.play(Hive.Tile.QUEEN_BEE, 1, -1);
@@ -176,6 +193,7 @@ class GameTest {
         game.move(-2, 0, 2, -1);
     }
 
+    // Requirement 5c
     @Test
     public void movePlayedTileIllegal() throws Hive.IllegalMove {
         game.play(Hive.Tile.QUEEN_BEE, 1, -1);
@@ -194,6 +212,7 @@ class GameTest {
         game.pass();
     }*/
 
+    // Requirement 3c
     @Test
     public void isWhiteAWinner() throws Hive.IllegalMove {
         Hive.Tile otherTile = Hive.Tile.SPIDER;
@@ -211,6 +230,7 @@ class GameTest {
 
     }
 
+    // Requirement 3d
     @Test
     public void GameIsADraw() throws Hive.IllegalMove {
 
@@ -242,6 +262,7 @@ class GameTest {
         assertTrue(game.isDraw());
     }
 
+    // Requirement 1
     @Test
     public void CheckIfAllTilesArePlayedForPlayerWhite() throws Hive.IllegalMove {
         game.play(Hive.Tile.QUEEN_BEE, 0, 0);
